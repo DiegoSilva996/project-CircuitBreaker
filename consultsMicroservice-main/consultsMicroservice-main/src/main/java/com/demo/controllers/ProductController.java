@@ -17,6 +17,7 @@ import com.demo.dto.ClientDto;
 import com.demo.dto.ProductDto;
 import com.demo.service.ConsultService;
 
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import reactor.core.publisher.Mono;
 
 
@@ -50,7 +51,7 @@ public class ProductController {
 		return service.deleteProduct(id);
 	}
 	
-	
+	@TimeLimiter(name="mConsults")
 	@GetMapping("/client/{id}")
 	public Mono<ClientDto> getClient(@PathVariable String id) throws InterruptedException{
 		TimeUnit.SECONDS.sleep(5L);
