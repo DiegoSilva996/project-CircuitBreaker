@@ -1,0 +1,35 @@
+server:
+  port: 8090
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      - id: consults-service
+        uri: http://localhost:8001
+        predicates:
+          - Path=/consults/**
+        filters:
+          - StripPrefix=1
+      - id: createProduct-service
+        uri: http://localhost:8002
+        predicates:
+          - Path=/createProduct/**
+        filters:
+          - StripPrefix=1
+      - id: createTransaction-service
+        uri: http://localhost:8003
+        predicates:
+          - Path=/createTransaction/**
+        filters:
+          - StripPrefix=1
