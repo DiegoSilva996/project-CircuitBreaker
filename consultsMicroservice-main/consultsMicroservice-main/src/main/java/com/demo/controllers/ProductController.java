@@ -1,6 +1,7 @@
 package com.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,16 +17,21 @@ import com.demo.service.ConsultService;
 
 import reactor.core.publisher.Mono;
 
+
 @RestController
 @RequestMapping("/consults")
 public class ProductController {
+	
+	@Autowired
+	private CircuitBreakerFactory cbFactory;
 
 	@Autowired
 	private ConsultService service;
 	
 	@GetMapping("/products/{id}")
 	public Mono<ProductDto> getProduct(@PathVariable String id){
-		return service.getProduct(id);
+		return cbFactory.create("product")
+				.run(()-> service.getProduct(id));
 	}
 	@PostMapping("/products/save")
 	public Mono<ProductDto> saveProduct(@RequestBody Mono<ProductDto> productDtoMono){
