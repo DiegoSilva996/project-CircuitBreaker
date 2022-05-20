@@ -51,13 +51,7 @@ public class ProductController {
 	@GetMapping("/client/{id}")
 	public Mono<ClientDto> getClient(@PathVariable String id){
 		return cbFactory.create("consultCircuit")
-				.run(()-> {
-					try {
-						return service.getClient(id);
-					} catch (InterruptedException e) {
-						return null;
-					}
-				});
+				.run(()-> service.getClient(id));
 		 
 	}
 	
