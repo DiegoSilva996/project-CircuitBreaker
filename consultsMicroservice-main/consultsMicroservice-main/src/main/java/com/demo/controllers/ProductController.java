@@ -1,5 +1,7 @@
 package com.demo.controllers;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,8 +52,11 @@ public class ProductController {
 	
 	
 	@GetMapping("/client/{id}")
-	public Mono<ClientDto> getClient(@PathVariable String id){
-		return service.getClient(id);
+	public Mono<ClientDto> getClient(@PathVariable String id) throws InterruptedException{
+		TimeUnit.SECONDS.sleep(5L);
+		return cbFactory.create("client")
+				.run(()-> service.getClient(id));
+		 
 	}
 	
 	@PostMapping("/client/save")
