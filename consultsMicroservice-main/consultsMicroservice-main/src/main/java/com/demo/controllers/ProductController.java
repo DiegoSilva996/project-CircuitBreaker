@@ -1,6 +1,5 @@
 package com.demo.controllers;
 
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -17,7 +16,6 @@ import com.demo.dto.ClientDto;
 import com.demo.dto.ProductDto;
 import com.demo.service.ConsultService;
 
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import reactor.core.publisher.Mono;
 
 
@@ -33,8 +31,7 @@ public class ProductController {
 	
 	@GetMapping("/products/{id}")
 	public Mono<ProductDto> getProduct(@PathVariable String id){
-		return cbFactory.create("product")
-				.run(()-> service.getProduct(id));
+		return  service.getProduct(id);
 	}
 	@PostMapping("/products/save")
 	public Mono<ProductDto> saveProduct(@RequestBody Mono<ProductDto> productDtoMono){
@@ -51,12 +48,16 @@ public class ProductController {
 		return service.deleteProduct(id);
 	}
 	
-	@TimeLimiter(name="mConsults")
 	@GetMapping("/client/{id}")
-	public Mono<ClientDto> getClient(@PathVariable String id) throws InterruptedException{
-		TimeUnit.SECONDS.sleep(5L);
-		return cbFactory.create("client")
-				.run(()-> service.getClient(id));
+	public Mono<ClientDto> getClient(@PathVariable String id){
+		return cbFactory.create("consultCircuit")
+				.run(()-> {
+					try {
+						return service.getClient(id);
+					} catch (InterruptedException e) {
+						return null;
+					}
+				});
 		 
 	}
 	

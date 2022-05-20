@@ -1,5 +1,7 @@
 package com.demo.service;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,14 @@ public class ConsultService {
 	}
 	
 	
-	public Mono<ClientDto> getClient(String id){
+	public Mono<ClientDto> getClient(String id)  throws InterruptedException {
+		if(id.equals("10")) {
+			throw new IllegalStateException("F");
+		}
+		if(id.equals("7")) {
+			TimeUnit.SECONDS.sleep(5L);
+		}
+		
 		return  clientRepository.findById(id).map(AppUtils::clientEntitytoDto);
 	}
 	
